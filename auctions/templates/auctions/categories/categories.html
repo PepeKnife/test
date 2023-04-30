@@ -1,0 +1,15 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <div class="card-header">
+        All categories
+    </div>
+    {% for cat in categories %}
+        <h1></h1>
+        <div class="card" style="width: 18rem;">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item" style="width:90%"><a href="{% url 'listing_category' cat=cat.category %}">{{ cat.category }}</a></li>
+            </ul>
+        </div>
+    {% endfor %}
+{% endblock %}

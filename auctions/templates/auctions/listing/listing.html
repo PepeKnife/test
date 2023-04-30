@@ -1,0 +1,111 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+    {% if object.active == False and user == object.higher_bid_user %}
+      <div class="alert alert-success" role="alert" style="height:10%;">
+        <p class="text-center">Closed, you won the auction</p>        
+      </div>     
+    {% elif object.active == False %} 
+      <div class="alert alert-danger" role="alert" style="height:10%;">
+        <p class="text-center">This auction already closed!!</p>        
+      </div>  
+    {% endif %}
+    <h2>Listing: {{ object.name }}</h2>
+
+    {% if user.is_authenticated %}
+      {% if watchlist %}
+        <a a href="{% url 'removeFromWatchlist' id=object.id %}" class="my-1 btn btn-danger">Remove from watchlist</a>
+      {% else %}
+        <a href="{% url 'addToWatchlist' id=object.id %}" class="my-1 btn btn-primary">Add to watchlist</a>
+      {% endif %}      
+    {% endif %}
+
+      <div class="card mb-3" style="max-width: 100%;">
+        <div class="row g-0">
+          <div class="col-md-4">
+            <img src="{{ object.image }}" class="img-fluid rounded-start" alt="{{ object.name }}">
+          </div>
+          <div class="col-md-8">
+            <div class="card-body">                             
+              <h5 class="card-title">{{ object.name }}</h5>
+              <h5 class="card-title">Price: ${{ object.price }}</h5>
+                <form action="{% url 'bid' id=object.id %}" method="POST">
+                  {% csrf_token %}
+                  {% if action %}
+                    {% if msg == "Bid placed successfuly!!" %}
+                      <div class="alert alert-success" role="alert">
+                        {{ msg }}
+                      </div>
+                    {% else %}
+                      <div class="alert alert-danger" role="alert">
+                        {{ msg }}
+                      </div>
+                    {% endif %}
+ 
+                  {% endif %}
+                  {% if user == object.higher_bid_user %}
+                    <p class="card-text m-1"><small class="text-muted">Higher bid: ${{ object.price }}. Your bid is the current bid</small></p> 
+                  {% else %}
+                    <p class="card-text m-1"><small class="text-muted">Higher bid: ${{ object.price }}. Bid maded by: {{ object.higher_bid_user }}</small></p> 
+                  {% endif %}                               
+                  <input type="text" name="new_bid" class="form-control" placeholder="Bid">
+                  <div>
+                    <button type="submit" class="my-2 btn btn-primary">Place Bid</button>      
+                  </div>                
+                </form>
+
+              <h5 class="card-title">Details<h5>
+                <ul>
+                    <li>Listed by: <a href="#">{{ object.owner }}</a></li>
+                    <li>Category: <a href="{% url 'listing_category' cat=object.category %}">{{ object.category }}</a></li>
+                    <li>{{ object.description }}</li>
+                </ul>
+              {% if user == object.owner %}
+              <div>
+                <a href="{% url 'close_listing' id=object.id%}" class="btn btn-danger" style="color:#ffff;">Close bid</a>
+              </div>
+                
+              {% endif %}
+              <p class="card-text"><small class="text-muted">Uploaded: {{ object.date }}</small></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+  </br>
+    <div class="form-comment">
+      <form action="{% url 'comments' object.id %}" method="POST">
+        {% csrf_token %}
+        <h3>Add a coment</h3>
+        <div class="mb-3 row">        
+          <input type="text" class="form-control mr-2 ml-3" placeholder="Your comment" style="width:50%;" name="comment">
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </div>      
+      </form>
+    </div>
+
+  </br>
+      <div class="comments-display ">
+        <h3>Comments</h3>
+        {% for c in comment %}
+          <ol class="list-group list-group-numbered mb-2">
+            <li class="list-group-item d-flex justify-content-between align-items-start">
+              <div class="ms-2 me-auto">
+                <div class="text-capitalize ">{{ c.user }}</div>
+                Comment: {{ c.comment }}
+                <div><p class="card-text"><small class="text-muted">{{ c.date }}</small></p></div>
+                
+              </div>
+            </li>
+          </ol>
+        {% endfor %}
+      </div>
+        
+
+
+
+    
+{% endblock %}

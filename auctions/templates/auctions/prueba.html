@@ -1,0 +1,13 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h1>Prueba</h1>
+    <h1>price: {{ price }}</h1>
+    <h1>Bid: {{ bid }}</h1>
+
+    {% if error %}
+        <div class="alert alert-danger" role="alert">
+            Bid most be higher than current price
+        </div>
+  {% endif %}
+{% endblock %}
